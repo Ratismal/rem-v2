@@ -1,9 +1,9 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 class Git extends Command {
-    constructor(t) {
+    constructor({t}) {
         super();
         this.cmd = "git";
         this.cat = "misc";

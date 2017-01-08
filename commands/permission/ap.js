@@ -1,20 +1,19 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
-let PermManager = require('../../modules/permissionManager');
+let Command = require('../../structures/command');
 let minimist = require('minimist');
 let discordReg = /<?(#|@|@&)[0-9]+>/g;
-let Selector = require('../../modules/selector');
+let Selector = require('../../structures/selector');
 class AddPermission extends Command {
-    constructor(t) {
+    constructor({t, mod}) {
         super();
         this.cmd = "ap";
         this.cat = "permission";
         this.needGuild = true;
         this.t = t;
         this.accessLevel = 0;
-        this.p = new PermManager();
+        this.p = mod.getMod('pm');
     }
 
     run(msg) {
@@ -22,8 +21,6 @@ class AddPermission extends Command {
         let args = minimist(messageSplit);
         this.parseArgs(args, (err, args) => {
             if (err) return msg.channel.createMessage(err);
-            // console.log(args);
-            // msg.channel.sendCode('JSON', JSON.stringify(args));
             if (args.r) {
                 return this.role(msg, args);
             }
@@ -41,7 +38,7 @@ class AddPermission extends Command {
         // console.log(perm);
         this.p.addPermission(msg.guild.id, perm, (err) => {
             if (err) return msg.channel.createMessage(this.t('generic.error', {lngs: msg.lang}));
-            msg.channel.createMessage(`Ok, the ${perm.type} now has the permission \`${perm.cat}.${perm.perm}\`set to ${perm.use}`);
+            msg.channel.createMessage(`Ok, the ${perm.type} now has the permission \`${perm.cat}.${perm.perm}\` set to ${perm.use}`);
         })
     }
 
@@ -99,7 +96,7 @@ class AddPermission extends Command {
             let roles = msg.guild.roles.filter(r => regex.test(r.name));
             if (roles.length > 1) {
                 let collector = new Selector(msg, roles, this.t, (err, number) => {
-                    if (err) return msg.channel.createMessage(err);
+                    if (err) return msg.channel.createMessage(this.t(err, {lngs: msg.lang}));
                     role = roles[number - 1];
                     let perm = this.p.createPermission(args.node, "role", role.id, args.allow);
                     this.addPermission(msg, perm);
@@ -129,11 +126,11 @@ class AddPermission extends Command {
         } else {
             let regex = new RegExp(`${args.c}.*`, 'gi');
             let channels = msg.guild.channels.filter(c => {
-                return regex.test(c.name)
+                return regex.test(c.name) && c.type === 0
             });
             if (channels.length > 1) {
                 let collector = new Selector(msg, channels, this.t, (err, number) => {
-                    if (err) return msg.channel.createMessage(err);
+                    if (err) return msg.channel.createMessage(this.t(err, {lngs: msg.lang}));
                     channel = channels[number - 1];
                     let perm = this.p.createPermission(args.node, "channel", channel.id, args.allow);
                     this.addPermission(msg, perm);

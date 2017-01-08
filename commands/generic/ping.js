@@ -1,9 +1,9 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 class Ping extends Command {
-    constructor(t) {
+    constructor({t}) {
         super();
         this.cmd = "ping";
         this.cat = "generic";

@@ -1,9 +1,9 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
-class Magic extends Command {
-    constructor(t) {
+let Command = require('../../structures/command');
+class Yui extends Command {
+    constructor({t}) {
         super();
         this.cmd = "yui";
         this.cat = "eastereggs";
@@ -17,4 +17,4 @@ class Magic extends Command {
         msg.channel.createMessage('https://rra.ram.moe/i/rkL9kPXNl.gif');
     }
 }
-module.exports = Magic;
+module.exports = Yui;

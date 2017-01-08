@@ -1,9 +1,9 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 let winston = require('winston');
-let Selector = require('../../modules/selector');
+let Selector = require('../../structures/selector');
 /**
  * The play command
  * plays a song duh.
@@ -16,7 +16,7 @@ class Play extends Command {
      * @param {Function} t - the translation module
      * @param {Object} v - the voice manager
      */
-    constructor(t, v) {
+    constructor({t, v}) {
         super();
         this.cmd = "play";
         this.cat = "music";
@@ -36,13 +36,17 @@ class Play extends Command {
             // this.clearListeners();
             msg.channel.createMessage(this.t(info, {url: url, lngs: msg.lang}));
         });
+
         this.v.once(`${msg.id}_search-result`, (results) => {
             let selector = new Selector(msg, results, this.t, (err, number) => {
                 if (err) {
                     this.clearListeners();
                     return msg.channel.createMessage(this.t(err, {lngs: msg.lang}));
                 }
-                msg.content = results[number - 1].link;
+                msg.content = `https://youtube.com/watch?v=${results[number - 1].id}`;
+                setTimeout(() => {
+                    this.clearListeners();
+                }, 3000);
                 this.v.play(msg);
             });
         });
@@ -52,8 +56,13 @@ class Play extends Command {
         });
         this.v.play(msg);
         setTimeout(() => {
-            this.v.removeListener('info');
-        }, 2000);
+            this.v.removeListener(`${msg.id}_info`);
+            this.v.removeListener(`${msg.id}_search-result`);
+        }, 3000);
+    }
+
+    clearListeners() {
+        this.v.removeAllListeners();
     }
 }
 module.exports = Play;

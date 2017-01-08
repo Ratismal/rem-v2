@@ -1,11 +1,11 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 let msgModel = require('../../DB/message');
 let winston = require('winston');
 class SayDelete extends Command {
-    constructor(t) {
+    constructor({t}) {
         super();
         this.cmd = "sayd";
         this.cat = "fun";

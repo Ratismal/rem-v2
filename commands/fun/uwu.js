@@ -1,9 +1,9 @@
 /**
  * Created by julia on 15.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 class uwu extends Command {
-    constructor(t) {
+    constructor({t}) {
         super();
         this.cmd = "uwu";
         this.cat = "fun";

@@ -1,19 +1,18 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
-let PermManager = require('../../modules/permissionManager');
+let Command = require('../../structures/command');
 let minimist = require('minimist');
 let AsciiTable = require('ascii-table');
 class GetPermission extends Command {
-    constructor(t) {
+    constructor({t, mod}) {
         super();
         this.cmd = "gp";
         this.cat = "permission";
         this.needGuild = true;
         this.t = t;
         this.accessLevel = 0;
-        this.p = new PermManager();
+        this.p = mod.getMod('pm');
     }
 
     run(msg) {
@@ -49,14 +48,18 @@ class GetPermission extends Command {
                 if (Perms[i].type === type) {
                     if (Perms[i].type === 'channel') {
                         let channel = rem.getChannel(Perms[i].id);
-                        table.addRow(added + 1, Perms[i].id, channel.name, Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
+                        table.addRow(added + 1, Perms[i].id, channel ? channel.name : 'deleted', Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
                         added += 1;
                     } else if (Perms[i].type === 'user') {
                         let user = rem.users.find(u => u.id === Perms[i].id);
-                        table.addRow(added + 1, Perms[i].id, user.username + '#' + user.discriminator, Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
+                        table.addRow(added + 1, Perms[i].id, user ? `${user.username}#${user.discriminator}` : 'deleted', Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
+                        added += 1;
+                    } else if (Perms[i].type === 'role') {
+                        let role = msg.guild.roles.find(r => r.id === Perms[i].id);
+                        table.addRow(added + 1, Perms[i].id, role ? role.name : 'deleted', Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
                         added += 1;
                     } else {
-                        table.addRow(added + 1, Perms[i].id, '-', Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
+                        table.addRow(added + 1, Perms[i].id, 'Guild', Perms[i].type, Perms[i].cat, Perms[i].perm, Perms[i].use);
                         added += 1;
                     }
                 }

@@ -1,12 +1,12 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 let minimist = require('minimist');
 let winston = require('winston');
 let async = require('async');
 class RemoveMessages extends Command {
-    constructor(t) {
+    constructor({t}) {
         super();
         this.cmd = "rm";
         this.cat = "moderation";

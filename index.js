@@ -12,7 +12,7 @@ const numCPUs = require('os').cpus().length;
 let Shard = require('./shard');
 let async = require('async');
 if (cluster.isMaster) {
-    let tracker = new StatTrack(3 * 60 * 60);
+    let tracker = new StatTrack(60);
     let resp = [];
     let workers = [];
     let shards = {};
@@ -31,23 +31,32 @@ if (cluster.isMaster) {
         restartWorker(worker.process.pid);
     });
     hub.on('_guild_update', (sid, guilds) => {
-        shards[sid] = {guilds};
+        shards[sid].guilds = guilds;
     });
     hub.on('_user_update', (sid, users) => {
-        shards[sid] = {users};
+        shards[sid].users = users;
+    });
+
+    tracker.on('error', (err) => {
+
     });
     tracker.on('fetch', () => {
         let guilds = 0;
+        let users = 0;
         _.forIn(shards, (value, key) => {
             guilds += value.guilds;
+            users += value.users;
+
         });
-        tracker.update(guilds);
+        console.log(`Total Guilds: ${guilds}, Total Users: ${users}`);
+        tracker.update(guilds, users);
     });
     process.on('SIGINT', () => {
         winston.error('Received SIGINT');
         process.exit(0);
     });
     for (let i = 0; i < config.shards; i++) {
+        shards[i] = {guilds: 0, users: 0};
         let worker = cluster.fork({id: i, count: config.shards});
         let workerobject = {worker: worker, shard_id: i, pid: worker.process.pid};
         workers.push(workerobject);
@@ -68,6 +77,7 @@ if (cluster.isMaster) {
     }
 
     function spawnWorker(env) {
+        shards[env.id] = {guilds: 0, users: 0};
         let worker = cluster.fork(env);
         let workerobject = {worker: worker, shard_id: env.id, pid: worker.process.pid};
         workers.push(workerobject);

@@ -1,7 +1,7 @@
 /**
  * Created by julia on 07.11.2016.
  */
-let Command = require('../../Objects/command');
+let Command = require('../../structures/command');
 /**
  * The force skip command
  * @extends Command
@@ -13,7 +13,7 @@ class ForceSkip extends Command {
      * @param {Function} t - the translation module
      * @param {Object} v - the voice manager
      */
-    constructor(t, v) {
+    constructor({t, v}) {
         super();
         this.cmd = "fskip";
         this.cat = "music";
